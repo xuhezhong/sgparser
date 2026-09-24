@@ -66,3 +66,4 @@ cd desktop && npm ci && node pack.mjs
 - 版本号改 `desktop/neutralino.config.json` 的 `version`。
 - 第一次打包会从 GitHub 下载 Neutralino 壳程序（约 8 MB）到 `desktop/bin/`。下载失败时，手工下载 `neutralinojs-v6.9.0.zip`（GitHub neutralinojs/neutralinojs 仓库的 v6.9.0 Release），把其中的 `neutralino-*` 文件解压到 `desktop/bin/` 再重跑。
 - Mac 版只做了本机签名（ad-hoc），所以同事第一次打开会被系统拦一次；要去掉这个提示，需要 Apple 开发者账号做公证。
+- 桌面版页面是在 dist 页面末尾注入 `neutralino.js`（官方前端库）和 `desktop/desktop.js`（菜单栏、关闭按钮处理）。原生接口只放行 `app.exit` 和 `window.setMainMenu`，不要关掉：Neutralino 6.9.0 在 macOS 上不开原生接口时，点关闭按钮会崩溃；没有菜单栏时 ⌘V 等快捷键无效。
