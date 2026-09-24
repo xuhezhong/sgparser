@@ -17,8 +17,8 @@ Neutralino.window.setMainMenu([
   ] },
 ]);
 
-// 红色关闭按钮：未开原生接口时壳在主线程直接退出，window::_close 对主队列 dispatch_sync 自锁崩溃；
-// 开了原生接口后关闭改为派发 windowClose 事件，由这里经原生接口（非主线程）退出
+// 红色关闭按钮：壳默认在主线程直接退出，window::_close 对主队列 dispatch_sync 自锁崩溃；
+// 配置里开原生接口并设 exitProcessOnClose=false 后，关闭改为派发 windowClose 事件，由这里经原生接口（非主线程）退出
 Neutralino.events.on('windowClose', () => Neutralino.app.exit());
 Neutralino.events.on('mainMenuItemClicked', (e) => {
   if (e.detail.id === 'quit') Neutralino.app.exit();
