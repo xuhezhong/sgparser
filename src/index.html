@@ -1,0 +1,58 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>南网报文解析</title>
+<style>
+  :root {
+    --fg: #1f2328; --muted: #656d76; --line: #d0d7de; --bg: #ffffff; --head-bg: #f6f8fa;
+    --ok: #1a7f37; --err: #cf222e; --err-bg: #ffebe9; --hl: #ffd33d; --row-hover: #fff8c5;
+    --s-head: #ddf4ff; --s-ctrl: #fbefff; --s-addr: #dafbe1; --s-app: #fff8c5;
+    --s-unit: #f6f8fa; --s-unit-alt: #e6ebf0; --s-aux: #ffe2cc; --s-tail: #eaeef2;
+  }
+  * { box-sizing: border-box; }
+  body { margin: 0; padding: 12px 16px 24px; background: var(--bg); color: var(--fg);
+    font: 13px/1.5 -apple-system, "PingFang SC", "Microsoft YaHei", "Segoe UI", sans-serif; }
+  header { display: flex; flex-wrap: wrap; align-items: baseline; gap: 4px 12px; margin-bottom: 8px; }
+  h1 { font-size: 18px; margin: 0; }
+  .sub { color: var(--muted); }
+  label { display: block; font-weight: 600; margin-bottom: 4px; }
+  textarea { width: 100%; font: 13px/1.5 ui-monospace, Menlo, Consolas, monospace; padding: 6px 8px;
+    border: 1px solid var(--line); border-radius: 6px; resize: vertical; }
+  .bar { margin: 6px 0; }
+  button { padding: 3px 12px; border: 1px solid var(--line); border-radius: 6px; background: var(--head-bg); cursor: pointer; }
+  .summary { padding: 6px 8px; border-left: 3px solid var(--ok); background: var(--head-bg); margin: 6px 0; min-height: 2.2em; word-break: break-all; }
+  .summary.bad { border-left-color: var(--err); color: var(--err); background: var(--err-bg); }
+  .hex { font: 13px/1.9 ui-monospace, Menlo, Consolas, monospace; margin: 6px 0 10px; word-break: break-all; }
+  .hex .b { display: inline-block; padding: 0 3px; margin: 0 1px 2px 0; border-radius: 3px; }
+  .s-head { background: var(--s-head); } .s-ctrl { background: var(--s-ctrl); } .s-addr { background: var(--s-addr); }
+  .s-app { background: var(--s-app); } .s-unit { background: var(--s-unit); } .s-unit.alt { background: var(--s-unit-alt); }
+  .s-aux { background: var(--s-aux); } .s-tail { background: var(--s-tail); }
+  .hex .b.hl { background: var(--hl); outline: 1px solid #bf8700; }
+  table.tree { width: 100%; border-collapse: collapse; table-layout: fixed; }
+  .tree th, .tree td { border: 1px solid var(--line); padding: 2px 6px; text-align: left; vertical-align: top; }
+  .tree th { background: var(--head-bg); position: sticky; top: 0; }
+  .tree th:nth-child(1) { width: 32%; }
+  .tree th:nth-child(2) { width: 26%; }
+  .tree td.name, .tree td.raw { white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+  .tree td.raw { font-family: ui-monospace, Menlo, Consolas, monospace; }
+  .tree tr:hover td { background: var(--row-hover); }
+  .tree tr.err td { color: var(--err); }
+  .tog { display: inline-block; width: 14px; cursor: pointer; user-select: none; color: var(--muted); }
+</style>
+</head>
+<body>
+<header><h1>南网报文解析</h1><span class="sub">Q/CSG1209022-2019 计量自动化终端上行通信规约 · 离线工具，报文只在本机处理</span></header>
+<label for="input">报文内容：</label>
+<textarea id="input" rows="4" spellcheck="false" placeholder="粘贴一帧 hex，例如 68 2F 00 2F 00 68 4A 00 11 74 …"></textarea>
+<div class="bar"><button id="clear" type="button">清空</button></div>
+<div id="summary" class="summary"></div>
+<div id="hex" class="hex"></div>
+<table class="tree">
+  <thead><tr><th>帧域</th><th>数据</th><th>说明</th></tr></thead>
+  <tbody id="tree"></tbody>
+</table>
+<!-- BUILD:SCRIPT -->
+</body>
+</html>

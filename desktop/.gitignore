@@ -1,0 +1,6 @@
+node_modules/
+bin/
+resources/
+dist/
+out/
+.tmp/

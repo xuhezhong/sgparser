@@ -1,0 +1,30 @@
+di(或范围首项)	附录	印刷页	标记	名称	格式	字节	已处理
+E0000B05	A	42	bytes_mismatch:DDYYMM=6(推断3)	远程模块信息	NNNNNNNN, NNNNNNNNNNNNNNNN, NNNNNNNN, DDYYMM, NNNNNNNN, DDYYMM	32	否
+E1800018	C	51	bytes_mismatch:NN=2(推断1)	本地通信模块程序版本号	NN, NN, DD, MM, YY, NNNN	9	否
+E1800020	C	52	var_length	重点户电能表1 测量点号	NNNN, NNNN, …, NNNN, NNNN	var	否
+00080000(范围)	C	53	block_irregular_rate	(当前) 第四限无功电数据块	rate_block?	var	否
+00600000(范围)	C	54	block_irregular_rate	(当前)正向有功精确电能数据块	rate_block?	var	否
+00610000(范围)	C	54	block_irregular_rate	(当前)反向有功精确电能数据块	rate_block?	var	否
+04050101(范围)	C	60	block_irregular_rate	当前套费率数据块	rate_block?	var	否
+04050201(范围)	C	60	block_irregular_rate	备用套费率数据块	rate_block?	var	否
+040606FF	C	60	bytes_unknown	当前套第 1 张阶梯表阶梯值 1	NNNNNN.NN NNNNNN.NN, .., NNNNNN.NN NNNN.NNNN, NNNN.NNNN, .., NNNN.NNNN, MMDDhh, MMDDhh, MMDDhh, MMDDhh, MMDDhh, MMDDhh	None	否
+040607FF	C	61	bytes_unknown	当前套第 2 张阶梯表阶梯值 1	NNNNNN.NN NNNNNN.NN, .., NNNNNN.NN NNNN.NNNN, NNNN.NNNN, .., NNNN.NNNN, MMDDhh, MMDDhh, MMDDhh, MMDDhh, MMDDhh, MMDDhh	None	否
+040608FF	C	61	bytes_unknown	当前套第 3 张阶梯表阶梯值 1	NNNNNN.NN NNNNNN.NN, .., NNNNNN.NN NNNN.NNNN, NNNN.NNNN, .., NNNN.NNNN, MMDDhh, MMDDhh, MMDDhh, MMDDhh, MMDDhh, MMDDhh	None	否
+040609FF	C	61	bytes_unknown	当前套第 4 张阶梯表阶梯值 1	NNNNNN.NN NNNNNN.NN, .., NNNNNN.NN NNNN.NNNN, NNNN.NNNN, .., NNNN.NNNN, MMDDhh, MMDDhh, MMDDhh, MMDDhh, MMDDhh, MMDDhh	None	否
+04060AFF	C	62	bytes_unknown	备用套第 1 张阶梯表阶梯值 1	NNNNNN.NN NNNNNN.NN, .., NNNNNN.NN NNNN.NNNN, NNNN.NNNN, .., NNNN.NNNN, MMDDhh, MMDDhh, MMDDhh, MMDDhh, MMDDhh, MMDDhh	None	否
+04060BFF	C	62	bytes_unknown	备用套第 2 张阶梯表阶梯值 1	NNNNNN.NN NNNNNN.NN, .., NNNNNN.NN NNNN.NNNN, NNNN.NNNN, .., NNNN.NNNN, MMDDhh, MMDDhh, MMDDhh, MMDDhh, MMDDhh, MMDDhh	None	否
+04060CFF	C	62	bytes_unknown	备用套第 3 张阶梯表阶梯值 1	NNNNNN.NN NNNNNN.NN, .., NNNNNN.NN NNNN.NNNN, NNNN.NNNN, .., NNNN.NNNN, MMDDhh, MMDDhh, MMDDhh, MMDDhh, MMDDhh, MMDDhh	None	否
+04060DFF	C	63	bytes_unknown	备用套第 4 张阶梯表阶梯值 1	NNNNNN.NN NNNNNN.NN, .., NNNNNN.NN NNNN.NNNN, NNNN.NNNN, .., NNNN.NNNN, MMDDhh, MMDDhh, MMDDhh, MMDDhh, MMDDhh, MMDDhh	None	否
+E200002B	D	98	struct_needs_manual	剩余电费不足	struct:ARD4	struct	否
+E200003D	D	99	struct_needs_manual	抄表失败	struct:ARD21	struct	否
+E200004C	D	99	struct_needs_manual	发现未知电表	struct:ARD22	struct	否
+E200004F	D	99	struct_needs_manual	费率参数表编程次数更改	struct:ARD23	struct	否
+E2000050	D	99	struct_needs_manual	阶梯表编程次数更改	struct:ARD24	struct	否
+E2000051	D	99	struct_needs_manual	异常插卡告警	struct:ARD25	struct	否
+E2010001	E	106	struct_needs_manual	编程记录	struct:ERD1	struct	否
+E201000E	E	106	struct_needs_manual	控制事件记录	struct:ERD6	struct	否
+E2010013	E	106	struct_needs_manual	消息认证错误记录	struct:ERD7	struct	否
+E2010014	E	106	struct_needs_manual	参数变更记录	struct:ERD8	struct	否
+E2010016	E	106	struct_needs_manual	恒定磁场干扰记录	struct:ERD10	struct	否
+E2010017	E	106	struct_needs_manual	负荷开关误动作记录	struct:ERD11	struct	否
+E2010018	E	106	struct_needs_manual	电源异常记录	struct:ERD12	struct	否

@@ -1,0 +1,7 @@
+{
+  "private": true,
+  "description": "南网报文解析桌面版打包（Neutralino 壳）",
+  "devDependencies": {
+    "@neutralinojs/neu": "11.7.2"
+  }
+}

@@ -1,0 +1,29 @@
+{
+  "applicationId": "com.zxw.sgparser",
+  "version": "1.0.0",
+  "defaultMode": "window",
+  "documentRoot": "/resources/",
+  "url": "/index.html",
+  "enableServer": true,
+  "enableNativeAPI": false,
+  "tokenSecurity": "one-time",
+  "modes": {
+    "window": {
+      "title": "南网报文解析",
+      "width": 1200,
+      "height": 820,
+      "minWidth": 640,
+      "minHeight": 480,
+      "center": true
+    }
+  },
+  "cli": {
+    "binaryName": "sgparser",
+    "resourcesPath": "/resources/",
+    "binaryVersion": "6.9.0"
+  },
+  "logging": {
+    "enabled": false,
+    "writeToLogFile": false
+  }
+}
