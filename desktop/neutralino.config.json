@@ -5,7 +5,8 @@
   "documentRoot": "/resources/",
   "url": "/index.html",
   "enableServer": true,
-  "enableNativeAPI": false,
+  "enableNativeAPI": true,
+  "nativeAllowList": ["app.exit", "window.setMainMenu"],
   "tokenSecurity": "one-time",
   "modes": {
     "window": {
@@ -14,7 +15,8 @@
       "height": 820,
       "minWidth": 640,
       "minHeight": 480,
-      "center": true
+      "center": true,
+      "exitProcessOnClose": false
     }
   },
   "cli": {

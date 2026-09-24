@@ -16,10 +16,16 @@ const run = (cmd, args, cwd = here) => execFileSync(cmd, args, { cwd, stdio: 'in
 if (process.platform !== 'darwin') throw new Error('只支持在 macOS 上打包（.app 需要 codesign 签名）');
 if (!existsSync(neu)) throw new Error('缺少 neu 命令行，先在 desktop/ 下执行 npm ci');
 
-// 1. 重新生成单文件 HTML，作为壳的唯一页面
+// 1. 重新生成单文件 HTML，作为壳的唯一页面；末尾注入前端库和壳脚本（菜单栏、关闭处理），网页版 dist 不变
 run(process.execPath, [join(root, 'build.mjs')], root);
-mkdirSync(join(here, 'resources'), { recursive: true });
-copyFileSync(join(root, 'dist', `${APP}.html`), join(here, 'resources', 'index.html'));
+const res = join(here, 'resources');
+mkdirSync(res, { recursive: true });
+// 文件名须以 neutralino.js 结尾：壳的内置服务器只给这类文件前置 NL_PORT、NL_TOKEN 等全局变量
+copyFileSync(join(here, 'node_modules', '@neutralinojs', 'lib', 'dist', 'neutralino.js'), join(res, 'neutralino.js'));
+copyFileSync(join(here, 'desktop.js'), join(res, 'desktop.js'));
+const html = readFileSync(join(root, 'dist', `${APP}.html`), 'utf8');
+if (html.split('</body>').length !== 2) throw new Error('dist 页面里 </body> 不是恰好一处，无法注入壳脚本');
+writeFileSync(join(res, 'index.html'), html.replace('</body>', '<script src="/neutralino.js"></script><script src="/desktop.js"></script></body>'));
 
 // 2. 壳程序按 cli.binaryVersion 从 GitHub 下载到 bin/，已下载则跳过
 if (!existsSync(join(here, 'bin', 'neutralino-mac_universal'))) run(neu, ['update']);
