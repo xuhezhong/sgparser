@@ -4,6 +4,7 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>南网报文解析</title>
+<link rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20viewBox%3D%220%200%20160%20160%22%3E%3Crect%20width%3D%22160%22%20height%3D%22160%22%20rx%3D%2236%22%20fill%3D%22%2324292f%22%2F%3E%3Crect%20x%3D%2226%22%20y%3D%2225%22%20width%3D%2230%22%20height%3D%2220%22%20rx%3D%2210%22%20fill%3D%22%239cd1ff%22%2F%3E%3Crect%20x%3D%2262%22%20y%3D%2225%22%20width%3D%2234%22%20height%3D%2220%22%20rx%3D%2210%22%20fill%3D%22%23e3b8ff%22%2F%3E%3Crect%20x%3D%2226%22%20y%3D%2255%22%20width%3D%2244%22%20height%3D%2220%22%20rx%3D%2210%22%20fill%3D%22%23ffe58f%22%2F%3E%3Crect%20x%3D%2276%22%20y%3D%2255%22%20width%3D%2220%22%20height%3D%2220%22%20rx%3D%2210%22%20fill%3D%22%238ee0a4%22%2F%3E%3Crect%20x%3D%2226%22%20y%3D%2285%22%20width%3D%2222%22%20height%3D%2220%22%20rx%3D%2210%22%20fill%3D%22%238ee0a4%22%2F%3E%3Crect%20x%3D%2254%22%20y%3D%2285%22%20width%3D%2242%22%20height%3D%2220%22%20rx%3D%2210%22%20fill%3D%22%23ffb38a%22%2F%3E%3Crect%20x%3D%2226%22%20y%3D%22115%22%20width%3D%2250%22%20height%3D%2220%22%20rx%3D%2210%22%20fill%3D%22%239cd1ff%22%2F%3E%3Cpath%20d%3D%22M130%2030%20L104%2086%20L122%2086%20L112%20130%20L146%2072%20L128%2072%20L140%2030%20Z%22%20fill%3D%22%23f5b700%22%2F%3E%3C%2Fsvg%3E">
 <style>
   :root {
     --fg: #1f2328; --muted: #656d76; --line: #d0d7de; --bg: #ffffff; --head-bg: #f6f8fa;
@@ -12,17 +13,26 @@
     --s-unit: #f6f8fa; --s-unit-alt: #e6ebf0; --s-aux: #ffe2cc; --s-tail: #eaeef2;
   }
   * { box-sizing: border-box; }
-  body { margin: 0; padding: 12px 16px 24px; background: var(--bg); color: var(--fg);
+  body { margin: 0; padding: 12px 16px 0; height: 100vh; height: 100dvh; display: flex; flex-direction: column; overflow: hidden; background: var(--bg); color: var(--fg);
     font: 13px/1.5 -apple-system, "PingFang SC", "Microsoft YaHei", "Segoe UI", sans-serif; }
-  header { display: flex; flex-wrap: wrap; align-items: baseline; gap: 4px 12px; margin-bottom: 8px; }
+  header { display: flex; flex-wrap: wrap; align-items: center; gap: 4px 12px; margin-bottom: 8px; }
+  .logo { flex: none; }
   h1 { font-size: 18px; margin: 0; }
   .sub { color: var(--muted); }
   label { display: block; font-weight: 600; margin-bottom: 4px; }
   textarea { width: 100%; font: 13px/1.5 ui-monospace, Menlo, Consolas, monospace; padding: 6px 8px;
     border: 1px solid var(--line); border-radius: 6px; resize: vertical; }
-  .bar { margin: 6px 0; }
+  #top { flex: none; display: flex; flex-direction: column; }
+  #top > * { flex: none; }
+  .input-bar { display: flex; align-items: center; justify-content: space-between; margin-bottom: 4px; }
+  .input-bar label { margin: 0; }
+  textarea { max-height: min(120px, 20vh); }
+  #table-wrap { flex: 1 1 0; min-height: 0; overflow: auto; margin-bottom: 12px; }
+  .summary { max-height: 100px; overflow-y: auto; }
+  #top > .hex { flex: none; overflow-y: auto; }
   button { padding: 3px 12px; border: 1px solid var(--line); border-radius: 6px; background: var(--head-bg); cursor: pointer; }
   .summary { padding: 6px 8px; border-left: 3px solid var(--ok); background: var(--head-bg); margin: 6px 0; min-height: 2.2em; word-break: break-all; }
+  .summary .ov { margin-top: 2px; font-weight: 600; color: var(--fg); }
   .summary.bad { border-left-color: var(--err); color: var(--err); background: var(--err-bg); }
   .hex { font: 13px/1.9 ui-monospace, Menlo, Consolas, monospace; margin: 6px 0 10px; word-break: break-all; }
   .hex .b { display: inline-block; padding: 0 3px; margin: 0 1px 2px 0; border-radius: 3px; }
@@ -30,9 +40,10 @@
   .s-app { background: var(--s-app); } .s-unit { background: var(--s-unit); } .s-unit.alt { background: var(--s-unit-alt); }
   .s-aux { background: var(--s-aux); } .s-tail { background: var(--s-tail); }
   .hex .b.hl { background: var(--hl); outline: 1px solid #bf8700; }
-  table.tree { width: 100%; border-collapse: collapse; table-layout: fixed; }
-  .tree th, .tree td { border: 1px solid var(--line); padding: 2px 6px; text-align: left; vertical-align: top; }
-  .tree th { background: var(--head-bg); position: sticky; top: 0; }
+  table.tree { width: 100%; border-collapse: separate; border-spacing: 0; table-layout: fixed; }
+  .tree th, .tree td { border: 0; border-right: 1px solid var(--line); border-bottom: 1px solid var(--line); padding: 2px 6px; text-align: left; vertical-align: top; }
+  .tree th:first-child, .tree td:first-child { border-left: 1px solid var(--line); }
+  .tree th { border-top: 1px solid var(--line); z-index: 1; background: var(--head-bg); position: sticky; top: 0; }
   .tree th:nth-child(1) { width: 32%; }
   .tree th:nth-child(2) { width: 26%; }
   .tree td.name, .tree td.raw { white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
@@ -43,16 +54,19 @@
 </style>
 </head>
 <body>
-<header><h1>南网报文解析</h1><span class="sub">Q/CSG1209022-2019 计量自动化终端上行通信规约 · 离线工具，报文只在本机处理</span></header>
-<label for="input">报文内容：</label>
+<div id="top">
+<header><img class="logo" src="data:image/svg+xml,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20viewBox%3D%220%200%20160%20160%22%3E%3Crect%20width%3D%22160%22%20height%3D%22160%22%20rx%3D%2236%22%20fill%3D%22%2324292f%22%2F%3E%3Crect%20x%3D%2226%22%20y%3D%2225%22%20width%3D%2230%22%20height%3D%2220%22%20rx%3D%2210%22%20fill%3D%22%239cd1ff%22%2F%3E%3Crect%20x%3D%2262%22%20y%3D%2225%22%20width%3D%2234%22%20height%3D%2220%22%20rx%3D%2210%22%20fill%3D%22%23e3b8ff%22%2F%3E%3Crect%20x%3D%2226%22%20y%3D%2255%22%20width%3D%2244%22%20height%3D%2220%22%20rx%3D%2210%22%20fill%3D%22%23ffe58f%22%2F%3E%3Crect%20x%3D%2276%22%20y%3D%2255%22%20width%3D%2220%22%20height%3D%2220%22%20rx%3D%2210%22%20fill%3D%22%238ee0a4%22%2F%3E%3Crect%20x%3D%2226%22%20y%3D%2285%22%20width%3D%2222%22%20height%3D%2220%22%20rx%3D%2210%22%20fill%3D%22%238ee0a4%22%2F%3E%3Crect%20x%3D%2254%22%20y%3D%2285%22%20width%3D%2242%22%20height%3D%2220%22%20rx%3D%2210%22%20fill%3D%22%23ffb38a%22%2F%3E%3Crect%20x%3D%2226%22%20y%3D%22115%22%20width%3D%2250%22%20height%3D%2220%22%20rx%3D%2210%22%20fill%3D%22%239cd1ff%22%2F%3E%3Cpath%20d%3D%22M130%2030%20L104%2086%20L122%2086%20L112%20130%20L146%2072%20L128%2072%20L140%2030%20Z%22%20fill%3D%22%23f5b700%22%2F%3E%3C%2Fsvg%3E" alt="" width="22" height="22"><h1>南网报文解析</h1><span class="sub">Q/CSG1209022-2019 计量自动化终端上行通信规约 · 离线工具，报文只在本机处理</span></header>
+<div class="input-bar"><label for="input">报文内容：</label><button id="clear" type="button">清空</button></div>
 <textarea id="input" rows="4" spellcheck="false" placeholder="粘贴一帧 hex，例如 68 2F 00 2F 00 68 4A 00 11 74 …"></textarea>
-<div class="bar"><button id="clear" type="button">清空</button></div>
 <div id="summary" class="summary"></div>
 <div id="hex" class="hex"></div>
+</div>
+<div id="table-wrap">
 <table class="tree">
   <thead><tr><th>帧域</th><th>数据</th><th>说明</th></tr></thead>
   <tbody id="tree"></tbody>
 </table>
+</div>
 <script>
 (() => {
 'use strict';
@@ -577,6 +591,7 @@ function parseUnit(bytes, off, end, kind, fi, idx) {
   }
   push(daNode(bytes, p));
   const di = diAt(bytes, p);
+  unit.di = di;
   const def = lookupDI(di);
   const diNode = decodeField(bytes, p, { name: '数据标识编码DI', bytes: 4, enc: 'hex' });
   diNode.desc = def ? `${di}：${def.name}` : `${di}：未收录（规约未定义）`;
@@ -671,6 +686,104 @@ function parseUnits(bytes, fi) {
   return { nodes, rest: { offset: off, length: end - off } };
 }
 
+// ---- overview.js ----
+// 报文概览：只读取帧信息和解析树，不重新解析字节（design-v2.md §5.3）。
+
+const ovActions = {
+  0x04: ['下发', '应答', '应答'],
+  0x06: ['安全认证', '返回安全认证', '请求安全认证'],
+  0x0a: ['读取参数', '返回参数', '返回参数'],
+  0x0c: ['抄读当前数据', '返回当前数据', '返回当前数据'],
+  0x0d: ['抄读历史数据', '返回历史数据', '返回历史数据'],
+  0x0e: ['读取事件记录', '返回事件记录', '上报事件记录'],
+  0x0f: ['文件传输', '返回文件传输', '返回文件传输'],
+  0x10: ['中继转发', '返回中继结果', '返回中继结果'],
+  0x12: ['读取任务数据', '返回任务数据', '上报任务数据'],
+  0x13: ['读取告警', '返回告警', '上报告警'],
+  0x15: ['下发自定义数据', '返回自定义数据', '上报自定义数据'],
+  0x20: ['返回请求的数据', '请求主站数据', '请求主站数据'],
+};
+const ovNames = { E0001000: '终端登录', E0001001: '终端心跳', E0001002: '终端退出登录', E080000F: '测量点参数' };
+
+function ovChild(unit, name) {
+  return (unit.children || []).find(n => n.name === name);
+}
+
+function ovName(di) {
+  if (ovNames[di]) return ovNames[di];
+  const def = lookupDI(di);
+  if (!def) return `DI ${di}（未收录）`;
+  if (/^以上数据(项)?集合$/.test(def.name)) {
+    const first = lookupDI(di.slice(0, 7) + '0');
+    if (first) return `${first.name}等数据项（集合）`;
+  }
+  return def.name;
+}
+
+function ovObjects(units) {
+  const points = new Set();
+  for (const unit of units) {
+    const da = ovChild(unit, '信息点标识DA');
+    if (!da || da.error) continue;
+    for (const p of String(da.value).split(',')) {
+      if (p === 'p0' || p === 'pALL' || /^p[1-9]\d*$/.test(p)) points.add(p);
+    }
+  }
+  const numbers = [...points].filter(p => p !== 'p0' && p !== 'pALL').map(p => p.slice(1));
+  const parts = [];
+  let addedNumbers = false;
+  for (const p of points) {
+    if (p === 'p0') parts.push('终端');
+    else if (p === 'pALL') parts.push('全部测量点');
+    else if (!addedNumbers) {
+      parts.push(`测量点 ${numbers.slice(0, 3).join('、')}${numbers.length > 3 ? ` 等 ${numbers.length} 个` : ''}`);
+      addedNumbers = true;
+    }
+  }
+  return parts.join('、');
+}
+
+function overviewOf(fi, unitNodes) {
+  if (fi.fatal) return '';
+  const units = unitNodes.filter(n => n.name.startsWith('信息体'));
+  const dataUnits = units.filter(n => n.di && !(fi.afn === 0 && n.di === 'E0000000'));
+  const names = [...new Set(dataUnits.map(n => ovName(n.di)))];
+  const data = names.slice(0, 3).join('、') + (names.length > 3 ? `等 ${names.length} 项` : '');
+  if (fi.afn === 2 && fi.dir === 1) return data;
+  const role = fi.dir === 0 ? '主站' : '终端';
+  let action = fi.afn === 2 ? '链路接口检测' : (ovActions[fi.afn]?.[fi.dir === 0 ? 0 : fi.prm ? 2 : 1] ?? fi.afnName);
+  const results = [];
+  if (fi.afn === 0) {
+    let yes = 0;
+    let no = 0;
+    let abnormal = 0;
+    for (const unit of units) {
+      const flag = ovChild(unit, '确认否认');
+      if (!flag || flag.error || !['00', '01'].includes(flag.value)) abnormal++;
+      else if (flag.value === '00') yes++;
+      else no++;
+    }
+    action = units.length && yes === units.length ? '确认' : units.length && no === units.length ? '否认' : '确认/否认';
+    if (action === '确认/否认' && no) results.push(`否认 ${no} 项`);
+    if (abnormal) results.push(`取值异常 ${abnormal} 项`);
+  }
+  const codes = units.map(n => ovChild(n, '错误码ERR'));
+  if (codes.some(Boolean)) {
+    if (fi.dir === 1) action = '应答';
+    const complete = n => n && !n.error && /^[0-9A-F]{2}$/.test(n.value);
+    const missing = codes.filter(n => !complete(n)).length;
+    const failed = codes.filter(n => complete(n) && n.value !== '00');
+    if (!missing && !failed.length) results.push('成功');
+    if (failed.length) {
+      const code = failed[0].value;
+      results.push(`${units.length === 1 ? '失败' : `失败 ${failed.length}/${units.length} 项`}：${code} ${ERR_CODES[code] ?? '规约未定义错误码'}`);
+    }
+    if (missing) results.push(`结果不完整 ${missing} 项`);
+  }
+  const objects = ovObjects(dataUnits);
+  return role + action + (data ? `：${data}${objects ? `（${objects}）` : ''}` : '') + (results.length ? `，${results.join('，')}` : '');
+}
+
 // ---- parser.js ----
 // 解析入口：清洗 → 帧层 → 信息体 → 附加信息（PW 推断）→ 分区、错误汇总、摘要（design.md §5.2）。任何输入都不抛异常。
 
@@ -686,15 +799,15 @@ function parse(text) {
     return runParse(text);
   } catch (e) {
     const msg = `内部错误：${e && e.message ? e.message : String(e)}`;
-    return { ok: false, summary: `解析有误：${msg}`, bytes: EMPTY, tree: [], errors: [msg] };
+    return { overview: '', ok: false, summary: `解析有误：${msg}`, bytes: EMPTY, tree: [], errors: [msg] };
   }
 }
 
 function runParse(text) {
   const cleaned = cleanHex(text);
-  if (cleaned.error) return { ok: false, summary: `解析有误：${cleaned.error}`, bytes: EMPTY, tree: [], errors: [cleaned.error] };
+  if (cleaned.error) return { overview: '', ok: false, summary: `解析有误：${cleaned.error}`, bytes: EMPTY, tree: [], errors: [cleaned.error] };
   const bytes = cleaned.bytes;
-  if (!bytes.length) return { ok: true, summary: '', bytes, tree: [], errors: [] };
+  if (!bytes.length) return { overview: '', ok: true, summary: '', bytes, tree: [], errors: [] };
   const fi = parseFrame(bytes);
   const units = fi.fatal ? { nodes: [], rest: { offset: 0, length: 0 } } : parseUnits(bytes, fi);
   const aux = [];
@@ -711,7 +824,13 @@ function runParse(text) {
   for (const nd of tree) setSection(nd, SECTION_OF[nd.name] || 'unit');
   const errors = [];
   collectErrors(tree, '', errors);
-  return { ok: errors.length === 0, summary: summarize(fi, errors), bytes, tree, errors };
+  let overview = '';
+  try {
+    overview = overviewOf(fi, units.nodes);
+  } catch {
+    // 概览失败不影响原有解析结果。
+  }
+  return { overview, ok: errors.length === 0, summary: summarize(fi, errors), bytes, tree, errors };
 }
 
 function setSection(node, section) {
@@ -829,13 +948,33 @@ function highlight(off, len) {
   }
 }
 
+// 空间不足时优先保留两行字节；短内容不强制撑高。
+function fitHex() {
+  const hex = byId('hex');
+  if (!hex.children.length) {
+    hex.style.maxHeight = '';
+    return;
+  }
+  const first = hex.firstElementChild;
+  const rect = first.getBoundingClientRect();
+  const second = Array.from(hex.children).find(b => b.getBoundingClientRect().top > rect.top + 1);
+  const style = getComputedStyle(first);
+  const pitch = second ? second.getBoundingClientRect().top - rect.top
+    : rect.height + parseFloat(style.marginTop) + parseFloat(style.marginBottom);
+  const other = byId('top').getBoundingClientRect().height - hex.getBoundingClientRect().height;
+  const next = `${Math.max(Math.ceil(2 * pitch) + 2, innerHeight / 2 - other)}px`;
+  if (hex.style.maxHeight !== next) hex.style.maxHeight = next;
+}
+
 function refresh() {
   const res = parse(byId('input').value);
   const sum = byId('summary');
-  sum.textContent = res.summary;
+  sum.replaceChildren(el('div', '', res.summary));
+  if (res.overview) sum.append(el('div', 'ov', `概览：${res.overview}`));
   sum.className = res.ok ? 'summary' : 'summary bad';
   renderHex(res);
   renderTree(res);
+  fitHex();
 }
 
 function mount() {
@@ -855,6 +994,10 @@ function mount() {
     if (tr) highlight(Number(tr.dataset.off), Number(tr.dataset.len));
   });
   tree.addEventListener('mouseleave', () => highlight(0, 0));
+  // 不观察 hex 自身，避免写入高度触发循环。
+  const observer = new ResizeObserver(fitHex);
+  for (const target of [byId('input'), byId('summary'), document.querySelector('header'), document.querySelector('.input-bar')]) observer.observe(target);
+  window.addEventListener('resize', fitHex);
   refresh();
 }
 

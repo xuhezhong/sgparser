@@ -86,13 +86,33 @@ function highlight(off, len) {
   }
 }
 
+// 空间不足时优先保留两行字节；短内容不强制撑高。
+function fitHex() {
+  const hex = byId('hex');
+  if (!hex.children.length) {
+    hex.style.maxHeight = '';
+    return;
+  }
+  const first = hex.firstElementChild;
+  const rect = first.getBoundingClientRect();
+  const second = Array.from(hex.children).find(b => b.getBoundingClientRect().top > rect.top + 1);
+  const style = getComputedStyle(first);
+  const pitch = second ? second.getBoundingClientRect().top - rect.top
+    : rect.height + parseFloat(style.marginTop) + parseFloat(style.marginBottom);
+  const other = byId('top').getBoundingClientRect().height - hex.getBoundingClientRect().height;
+  const next = `${Math.max(Math.ceil(2 * pitch) + 2, innerHeight / 2 - other)}px`;
+  if (hex.style.maxHeight !== next) hex.style.maxHeight = next;
+}
+
 function refresh() {
   const res = parse(byId('input').value);
   const sum = byId('summary');
-  sum.textContent = res.summary;
+  sum.replaceChildren(el('div', '', res.summary));
+  if (res.overview) sum.append(el('div', 'ov', `概览：${res.overview}`));
   sum.className = res.ok ? 'summary' : 'summary bad';
   renderHex(res);
   renderTree(res);
+  fitHex();
 }
 
 function mount() {
@@ -112,6 +132,10 @@ function mount() {
     if (tr) highlight(Number(tr.dataset.off), Number(tr.dataset.len));
   });
   tree.addEventListener('mouseleave', () => highlight(0, 0));
+  // 不观察 hex 自身，避免写入高度触发循环。
+  const observer = new ResizeObserver(fitHex);
+  for (const target of [byId('input'), byId('summary'), document.querySelector('header'), document.querySelector('.input-bar')]) observer.observe(target);
+  window.addEventListener('resize', fitHex);
   refresh();
 }
 

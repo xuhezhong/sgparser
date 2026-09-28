@@ -16,6 +16,27 @@ const run = (cmd, args, cwd = here) => execFileSync(cmd, args, { cwd, stdio: 'in
 if (process.platform !== 'darwin') throw new Error('只支持在 macOS 上打包（.app 需要 codesign 签名）');
 if (!existsSync(neu)) throw new Error('缺少 neu 命令行，先在 desktop/ 下执行 npm ci');
 
+// 0. 从同一份 SVG 生成各平台图标；只依赖 macOS 自带工具。
+const icons = join(here, 'icons');
+const iconset = join(icons, 'AppIcon.iconset');
+mkdirSync(iconset, { recursive: true });
+const logo = readFileSync(join(root, 'src', 'logo.svg'), 'utf8').trim();
+if (!/viewBox="0 0 160 160"/.test(logo)) throw new Error('logo 的 viewBox 必须为 0 0 160 160');
+const padded = join(icons, 'padded.svg');
+writeFileSync(padded, `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1024 1024"><g transform="translate(100 100) scale(5.15)">${logo.replace(/^<svg[^>]*>/, '').replace(/<\/svg>$/, '')}</g></svg>`);
+try {
+  run('sips', ['-s', 'format', 'png', '-z', '256', '256', join(root, 'src', 'logo.svg'), '--out', join(icons, 'app.png')]);
+  for (const size of [16, 32, 128, 256, 512]) {
+    for (const scale of [1, 2]) {
+      const pixels = String(size * scale);
+      run('sips', ['-s', 'format', 'png', '-z', pixels, pixels, padded, '--out', join(iconset, `icon_${size}x${size}${scale === 2 ? '@2x' : ''}.png`)]);
+    }
+  }
+} catch (cause) {
+  throw new Error('图标转换失败：请确认当前 macOS 的 sips 支持读取 SVG（已在 macOS 27 验证）', { cause });
+}
+run('iconutil', ['-c', 'icns', iconset, '-o', join(icons, 'AppIcon.icns')]);
+
 // 1. 重新生成单文件 HTML，作为壳的唯一页面；末尾注入前端库和壳脚本（菜单栏、关闭处理），网页版 dist 不变
 run(process.execPath, [join(root, 'build.mjs')], root);
 const res = join(here, 'resources');
@@ -49,10 +70,13 @@ const exec = join(app, 'Contents', 'MacOS', bin);
 mkdirSync(dirname(exec), { recursive: true });
 copyFileSync(join(built, `${bin}-mac_universal`), exec);
 chmodSync(exec, 0o755);
+mkdirSync(join(app, 'Contents', 'Resources'), { recursive: true });
+copyFileSync(join(icons, 'AppIcon.icns'), join(app, 'Contents', 'Resources', 'AppIcon.icns'));
 writeFileSync(join(app, 'Contents', 'Info.plist'), `<?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
 <plist version="1.0">
 <dict>
+  <key>CFBundleIconFile</key><string>AppIcon</string>
   <key>CFBundleExecutable</key><string>${bin}</string>
   <key>CFBundleIdentifier</key><string>${cfg.applicationId}</string>
   <key>CFBundleName</key><string>${APP}</string>
