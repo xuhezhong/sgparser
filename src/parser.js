@@ -1,6 +1,7 @@
 // 解析入口：清洗 → 帧层 → 信息体 → 附加信息（PW 推断）→ 分区、错误汇总、摘要（design.md §5.2）。任何输入都不抛异常。
 import { cleanHex, parseFrame } from './frame.js';
 import { parseUnits } from './unit.js';
+import { overviewOf } from './overview.js';
 import { decodeField } from './decode.js';
 
 // 顶层节点 → hex 视图分区；未列出的（信息体、规约外数据、后续数据等）归入 unit
@@ -15,15 +16,15 @@ export function parse(text) {
     return runParse(text);
   } catch (e) {
     const msg = `内部错误：${e && e.message ? e.message : String(e)}`;
-    return { ok: false, summary: `解析有误：${msg}`, bytes: EMPTY, tree: [], errors: [msg] };
+    return { overview: '', ok: false, summary: `解析有误：${msg}`, bytes: EMPTY, tree: [], errors: [msg] };
   }
 }
 
 function runParse(text) {
   const cleaned = cleanHex(text);
-  if (cleaned.error) return { ok: false, summary: `解析有误：${cleaned.error}`, bytes: EMPTY, tree: [], errors: [cleaned.error] };
+  if (cleaned.error) return { overview: '', ok: false, summary: `解析有误：${cleaned.error}`, bytes: EMPTY, tree: [], errors: [cleaned.error] };
   const bytes = cleaned.bytes;
-  if (!bytes.length) return { ok: true, summary: '', bytes, tree: [], errors: [] };
+  if (!bytes.length) return { overview: '', ok: true, summary: '', bytes, tree: [], errors: [] };
   const fi = parseFrame(bytes);
   const units = fi.fatal ? { nodes: [], rest: { offset: 0, length: 0 } } : parseUnits(bytes, fi);
   const aux = [];
@@ -40,7 +41,13 @@ function runParse(text) {
   for (const nd of tree) setSection(nd, SECTION_OF[nd.name] || 'unit');
   const errors = [];
   collectErrors(tree, '', errors);
-  return { ok: errors.length === 0, summary: summarize(fi, errors), bytes, tree, errors };
+  let overview = '';
+  try {
+    overview = overviewOf(fi, units.nodes);
+  } catch {
+    // 概览失败不影响原有解析结果。
+  }
+  return { overview, ok: errors.length === 0, summary: summarize(fi, errors), bytes, tree, errors };
 }
 
 function setSection(node, section) {

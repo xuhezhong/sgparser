@@ -5,7 +5,7 @@ import { fileURLToPath } from 'node:url';
 import vm from 'node:vm';
 
 const root = dirname(fileURLToPath(import.meta.url));
-const ORDER = ['decode.js', 'di_dict.js', 'dict.js', 'frame.js', 'unit.js', 'parser.js', 'ui.js'];
+const ORDER = ['decode.js', 'di_dict.js', 'dict.js', 'frame.js', 'unit.js', 'overview.js', 'parser.js', 'ui.js'];
 const IMPORT_LINE = /^import \{[^}]*\} from '\.\/[a-z_]+\.js';\s*$/;
 const DECL = /^(?:async\s+)?(?:function\*?|const|let|class)\s+([A-Za-z_$][\w$]*)/gm;
 const out = join(root, 'dist', '南网报文解析.html');

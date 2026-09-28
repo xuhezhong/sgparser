@@ -114,6 +114,7 @@ function parseUnit(bytes, off, end, kind, fi, idx) {
   }
   push(daNode(bytes, p));
   const di = diAt(bytes, p);
+  unit.di = di;
   const def = lookupDI(di);
   const diNode = decodeField(bytes, p, { name: '数据标识编码DI', bytes: 4, enc: 'hex' });
   diNode.desc = def ? `${di}：${def.name}` : `${di}：未收录（规约未定义）`;

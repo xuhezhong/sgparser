@@ -1,5 +1,6 @@
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
+import { parseFrame } from '../src/frame.js';
 import { parse } from '../src/parser.js';
 import { NEED_PRIVATE, findNode, hexToBytes, loadCorpus } from './helpers.mjs';
 
@@ -24,6 +25,8 @@ test('真实语料整批回归（R10.3）', { skip: NEED_PRIVATE }, () => {
   for (const { hex } of loadCorpus()) {
     s.total++;
     const r = parse(hex);
+    assert.equal(typeof r.overview, 'string', `第 ${s.total} 帧概览类型`);
+    if (!parseFrame(hexToBytes(hex)).fatal) assert.ok(r.overview, `第 ${s.total} 帧概览为空`);
     const expected = KNOWN_ABNORMAL[hex.slice(0, 14)];
     if (expected) {
       s.abnormal++;

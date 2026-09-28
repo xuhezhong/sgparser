@@ -18,11 +18,13 @@ test('构建产物：单文件、无外链、小于 1MB、脚本可编译（R8.1
   assert.ok(!html.includes('<!-- BUILD:SCRIPT -->'));
   const script = html.match(/<script>\n([\s\S]*)\n<\/script>/)[1];
   assert.doesNotThrow(() => new vm.Script(script));
+  assert.ok(script.indexOf('// ---- overview.js ----') < script.indexOf('// ---- parser.js ----'));
+  assert.match(script, /function overviewOf\(/);
 });
 
 test('构建脚本：顶层重名报错、函数内同名不误报、不支持的 export 写法报错（评审 Minor 4）', () => {
   const dir = mkdtempSync(join(tmpdir(), 'sgparser-build-'));
-  const files = ['decode.js', 'di_dict.js', 'dict.js', 'frame.js', 'unit.js', 'parser.js', 'ui.js'];
+  const files = ['decode.js', 'di_dict.js', 'dict.js', 'frame.js', 'unit.js', 'overview.js', 'parser.js', 'ui.js'];
   mkdirSync(join(dir, 'src'));
   copyFileSync(join(root, 'build.mjs'), join(dir, 'build.mjs'));
   writeFileSync(join(dir, 'src', 'index.html'), '<!-- BUILD:SCRIPT -->');
