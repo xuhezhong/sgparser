@@ -928,8 +928,10 @@ function renderTree(res) {
       }
       name.append(tog, document.createTextNode(`${nd.name}<${nd.length}>`));
       name.title = nd.name;
-      const raw = el('td', 'raw', nd.raw);
-      raw.title = nd.raw;
+      // 位字段没有独立原始字节，显示已解析的取值（包括零值）。
+      const data = nd.raw || (nd.value ?? '');
+      const raw = el('td', 'raw', data);
+      raw.title = data;
       const extra = [nd.note ? `〔${nd.note}〕` : '', nd.error && !(nd.desc || '').includes(nd.error) ? `【${nd.error}】` : ''];
       tr.append(name, raw, el('td', 'desc', [nd.desc, ...extra].filter(Boolean).join(' ')));
       if (parent) parent.kids.push(tr);
