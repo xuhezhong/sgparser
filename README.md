@@ -6,7 +6,9 @@
 
 1. 下载 `dist/南网报文解析.html`，用 Chrome、Edge 或 Safari 打开（双击即可，不需要网络，报文只在本机处理）。
 2. 在「报文内容」里粘贴一帧 hex（空格、换行、`0x`、逗号都可以），会自动解析。
-3. 鼠标悬停在字段行上，上方 hex 视图会高亮对应字节；点 ▾ / ▸ 折叠或展开。
+3. 摘要下方的「概览」说明操作与测量点；应答带成功、失败或结果不完整提示。应答码成功不代表电表物理状态已经改变。
+4. 滚动时输入区和 hex 保持可见，字段表格独立滚动、表头固定；小窗口优先保留两行 hex，长摘要及长 hex 可分别滚动。
+5. 鼠标悬停在字段行上，上方 hex 视图会高亮对应字节；点 ▾ / ▸ 折叠或展开。
 
 说明列里的标记：
 
@@ -67,3 +69,11 @@ cd desktop && npm ci && node pack.mjs
 - 第一次打包会从 GitHub 下载 Neutralino 壳程序（约 8 MB）到 `desktop/bin/`。下载失败时，手工下载 `neutralinojs-v6.9.0.zip`（GitHub neutralinojs/neutralinojs 仓库的 v6.9.0 Release），把其中的 `neutralino-*` 文件解压到 `desktop/bin/` 再重跑。
 - Mac 版只做了本机签名（ad-hoc），所以同事第一次打开会被系统拦一次；要去掉这个提示，需要 Apple 开发者账号做公证。
 - 桌面版页面是在 dist 页面末尾注入 `neutralino.js`（官方前端库）和 `desktop/desktop.js`（菜单栏、关闭按钮处理）。原生接口只放行 `app.exit` 和 `window.setMainMenu`。原生接口和 `exitProcessOnClose: false` 都不要改回：Neutralino 6.9.0 在 macOS 上由壳自己退出时，点关闭按钮会崩溃；没有菜单栏时 ⌘V 等快捷键无效。
+
+
+### 1.1.0 发版记录
+
+- 版本号：1.1.0；增加操作概览、固定布局和字节条加闪电 logo，网页版与桌面版使用同一源图。
+- 配置变动：`desktop/neutralino.config.json` 的 `version` 更新为 `1.1.0`，新增 `applicationIcon: "icons/app.png"`；原生接口白名单及关闭处理不变。
+- 数据库维护：不适用。
+- 图标构建：`src/logo.svg` 为源文件；打包时通过系统 `sips` 和 `iconutil` 生成 PNG/icns，产物在忽略的 `desktop/icons/`。需要支持 SVG 转 PNG 的 macOS（已在 macOS 27 验证）；较旧系统转换失败时会给出错误提示。无需新增 npm 依赖。
