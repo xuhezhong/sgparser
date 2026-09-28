@@ -31,7 +31,13 @@ let tpl = readFileSync(join(root, 'src', 'index.html'), 'utf8');
 if (!tpl.includes('<!-- BUILD:SCRIPT -->')) throw new Error('index.html 缺少 <!-- BUILD:SCRIPT --> 占位');
 const svg = readFileSync(join(root, 'src', 'logo.svg'), 'utf8').trim().replace(/>\s+</g, '><');
 const logoUri = 'data:image/svg+xml,' + encodeURIComponent(svg);
+// 网页和桌面版共用打包配置中的版本号，构建时写入离线页面。
+const { version } = JSON.parse(readFileSync(join(root, 'desktop', 'neutralino.config.json'), 'utf8'));
+if (typeof version !== 'string' || !/^\d+\.\d+\.\d+(?:-[0-9A-Za-z.-]+)?(?:\+[0-9A-Za-z.-]+)?$/.test(version)) {
+  throw new Error('desktop/neutralino.config.json 缺少有效版本号');
+}
 for (const [marker, replacement] of [
+  ['VERSION', `v${version}`],
   ['ICON', `<link rel="icon" type="image/svg+xml" href="${logoUri}">`],
   ['LOGO', `<img class="logo" src="${logoUri}" alt="" width="22" height="22">`],
 ]) {

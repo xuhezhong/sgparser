@@ -18,6 +18,7 @@
   header { display: flex; flex-wrap: wrap; align-items: center; gap: 4px 12px; margin-bottom: 8px; }
   .logo { flex: none; }
   h1 { font-size: 18px; margin: 0; }
+  .version { font-size: 12px; font-weight: 400; color: var(--muted); white-space: nowrap; }
   .sub { color: var(--muted); }
   label { display: block; font-weight: 600; margin-bottom: 4px; }
   textarea { width: 100%; font: 13px/1.5 ui-monospace, Menlo, Consolas, monospace; padding: 6px 8px;
@@ -55,7 +56,7 @@
 </head>
 <body>
 <div id="top">
-<header><!-- BUILD:LOGO --><h1>南网报文解析</h1><span class="sub">Q/CSG1209022-2019 计量自动化终端上行通信规约 · 离线工具，报文只在本机处理</span></header>
+<header><!-- BUILD:LOGO --><h1>南网报文解析 <span class="version"><!-- BUILD:VERSION --></span></h1><span class="sub">Q/CSG1209022-2019 计量自动化终端上行通信规约 · 离线工具，报文只在本机处理</span></header>
 <div class="input-bar"><label for="input">报文内容：</label><button id="clear" type="button">清空</button></div>
 <textarea id="input" rows="4" spellcheck="false" placeholder="粘贴一帧 hex，例如 68 2F 00 2F 00 68 4A 00 11 74 …"></textarea>
 <div id="summary" class="summary"></div>
