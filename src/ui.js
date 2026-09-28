@@ -89,7 +89,8 @@ function highlight(off, len) {
 function refresh() {
   const res = parse(byId('input').value);
   const sum = byId('summary');
-  sum.textContent = res.summary;
+  sum.replaceChildren(el('div', '', res.summary));
+  if (res.overview) sum.append(el('div', 'ov', `概览：${res.overview}`));
   sum.className = res.ok ? 'summary' : 'summary bad';
   renderHex(res);
   renderTree(res);
