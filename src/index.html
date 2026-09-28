@@ -4,6 +4,7 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>南网报文解析</title>
+<!-- BUILD:ICON -->
 <style>
   :root {
     --fg: #1f2328; --muted: #656d76; --line: #d0d7de; --bg: #ffffff; --head-bg: #f6f8fa;
@@ -14,7 +15,8 @@
   * { box-sizing: border-box; }
   body { margin: 0; padding: 12px 16px 0; height: 100vh; height: 100dvh; display: flex; flex-direction: column; overflow: hidden; background: var(--bg); color: var(--fg);
     font: 13px/1.5 -apple-system, "PingFang SC", "Microsoft YaHei", "Segoe UI", sans-serif; }
-  header { display: flex; flex-wrap: wrap; align-items: baseline; gap: 4px 12px; margin-bottom: 8px; }
+  header { display: flex; flex-wrap: wrap; align-items: center; gap: 4px 12px; margin-bottom: 8px; }
+  .logo { flex: none; }
   h1 { font-size: 18px; margin: 0; }
   .sub { color: var(--muted); }
   label { display: block; font-weight: 600; margin-bottom: 4px; }
@@ -53,7 +55,7 @@
 </head>
 <body>
 <div id="top">
-<header><h1>南网报文解析</h1><span class="sub">Q/CSG1209022-2019 计量自动化终端上行通信规约 · 离线工具，报文只在本机处理</span></header>
+<header><!-- BUILD:LOGO --><h1>南网报文解析</h1><span class="sub">Q/CSG1209022-2019 计量自动化终端上行通信规约 · 离线工具，报文只在本机处理</span></header>
 <div class="input-bar"><label for="input">报文内容：</label><button id="clear" type="button">清空</button></div>
 <textarea id="input" rows="4" spellcheck="false" placeholder="粘贴一帧 hex，例如 68 2F 00 2F 00 68 4A 00 11 74 …"></textarea>
 <div id="summary" class="summary"></div>

@@ -4,6 +4,7 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>南网报文解析</title>
+<link rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20viewBox%3D%220%200%20160%20160%22%3E%3Crect%20width%3D%22160%22%20height%3D%22160%22%20rx%3D%2236%22%20fill%3D%22%2324292f%22%2F%3E%3Crect%20x%3D%2226%22%20y%3D%2225%22%20width%3D%2230%22%20height%3D%2220%22%20rx%3D%2210%22%20fill%3D%22%239cd1ff%22%2F%3E%3Crect%20x%3D%2262%22%20y%3D%2225%22%20width%3D%2234%22%20height%3D%2220%22%20rx%3D%2210%22%20fill%3D%22%23e3b8ff%22%2F%3E%3Crect%20x%3D%2226%22%20y%3D%2255%22%20width%3D%2244%22%20height%3D%2220%22%20rx%3D%2210%22%20fill%3D%22%23ffe58f%22%2F%3E%3Crect%20x%3D%2276%22%20y%3D%2255%22%20width%3D%2220%22%20height%3D%2220%22%20rx%3D%2210%22%20fill%3D%22%238ee0a4%22%2F%3E%3Crect%20x%3D%2226%22%20y%3D%2285%22%20width%3D%2222%22%20height%3D%2220%22%20rx%3D%2210%22%20fill%3D%22%238ee0a4%22%2F%3E%3Crect%20x%3D%2254%22%20y%3D%2285%22%20width%3D%2242%22%20height%3D%2220%22%20rx%3D%2210%22%20fill%3D%22%23ffb38a%22%2F%3E%3Crect%20x%3D%2226%22%20y%3D%22115%22%20width%3D%2250%22%20height%3D%2220%22%20rx%3D%2210%22%20fill%3D%22%239cd1ff%22%2F%3E%3Cpath%20d%3D%22M130%2030%20L104%2086%20L122%2086%20L112%20130%20L146%2072%20L128%2072%20L140%2030%20Z%22%20fill%3D%22%23f5b700%22%2F%3E%3C%2Fsvg%3E">
 <style>
   :root {
     --fg: #1f2328; --muted: #656d76; --line: #d0d7de; --bg: #ffffff; --head-bg: #f6f8fa;
@@ -14,7 +15,8 @@
   * { box-sizing: border-box; }
   body { margin: 0; padding: 12px 16px 0; height: 100vh; height: 100dvh; display: flex; flex-direction: column; overflow: hidden; background: var(--bg); color: var(--fg);
     font: 13px/1.5 -apple-system, "PingFang SC", "Microsoft YaHei", "Segoe UI", sans-serif; }
-  header { display: flex; flex-wrap: wrap; align-items: baseline; gap: 4px 12px; margin-bottom: 8px; }
+  header { display: flex; flex-wrap: wrap; align-items: center; gap: 4px 12px; margin-bottom: 8px; }
+  .logo { flex: none; }
   h1 { font-size: 18px; margin: 0; }
   .sub { color: var(--muted); }
   label { display: block; font-weight: 600; margin-bottom: 4px; }
@@ -53,7 +55,7 @@
 </head>
 <body>
 <div id="top">
-<header><h1>南网报文解析</h1><span class="sub">Q/CSG1209022-2019 计量自动化终端上行通信规约 · 离线工具，报文只在本机处理</span></header>
+<header><img class="logo" src="data:image/svg+xml,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20viewBox%3D%220%200%20160%20160%22%3E%3Crect%20width%3D%22160%22%20height%3D%22160%22%20rx%3D%2236%22%20fill%3D%22%2324292f%22%2F%3E%3Crect%20x%3D%2226%22%20y%3D%2225%22%20width%3D%2230%22%20height%3D%2220%22%20rx%3D%2210%22%20fill%3D%22%239cd1ff%22%2F%3E%3Crect%20x%3D%2262%22%20y%3D%2225%22%20width%3D%2234%22%20height%3D%2220%22%20rx%3D%2210%22%20fill%3D%22%23e3b8ff%22%2F%3E%3Crect%20x%3D%2226%22%20y%3D%2255%22%20width%3D%2244%22%20height%3D%2220%22%20rx%3D%2210%22%20fill%3D%22%23ffe58f%22%2F%3E%3Crect%20x%3D%2276%22%20y%3D%2255%22%20width%3D%2220%22%20height%3D%2220%22%20rx%3D%2210%22%20fill%3D%22%238ee0a4%22%2F%3E%3Crect%20x%3D%2226%22%20y%3D%2285%22%20width%3D%2222%22%20height%3D%2220%22%20rx%3D%2210%22%20fill%3D%22%238ee0a4%22%2F%3E%3Crect%20x%3D%2254%22%20y%3D%2285%22%20width%3D%2242%22%20height%3D%2220%22%20rx%3D%2210%22%20fill%3D%22%23ffb38a%22%2F%3E%3Crect%20x%3D%2226%22%20y%3D%22115%22%20width%3D%2250%22%20height%3D%2220%22%20rx%3D%2210%22%20fill%3D%22%239cd1ff%22%2F%3E%3Cpath%20d%3D%22M130%2030%20L104%2086%20L122%2086%20L112%20130%20L146%2072%20L128%2072%20L140%2030%20Z%22%20fill%3D%22%23f5b700%22%2F%3E%3C%2Fsvg%3E" alt="" width="22" height="22"><h1>南网报文解析</h1><span class="sub">Q/CSG1209022-2019 计量自动化终端上行通信规约 · 离线工具，报文只在本机处理</span></header>
 <div class="input-bar"><label for="input">报文内容：</label><button id="clear" type="button">清空</button></div>
 <textarea id="input" rows="4" spellcheck="false" placeholder="粘贴一帧 hex，例如 68 2F 00 2F 00 68 4A 00 11 74 …"></textarea>
 <div id="summary" class="summary"></div>
